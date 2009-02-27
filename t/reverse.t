@@ -3,10 +3,10 @@ use warnings;
 use Test::More tests => 8;
 
 use App::Queue::Message;
-use App::Queue::Queue;
+use App::Queue::MemoryQueue;
 use t::utils::list;
 
-BEGIN { *rev = *App::Queue::Queue::_lreverse }
+BEGIN { *rev = *App::Queue::MemoryQueue::_lreverse }
 
 for my $list ([], [1], [1,2], [1,2,3]){
     my $msg = fromlist(@$list);

@@ -2,10 +2,10 @@ use strict;
 use warnings;
 use Test::More tests => 9;
 
-use App::Queue::Queue;
+use App::Queue::MemoryQueue;
 use t::utils::list;
 
-my $q = App::Queue::Queue->new;
+my $q = App::Queue::MemoryQueue->new;
 
 $q->put(msg($_)) for (1..10);
 

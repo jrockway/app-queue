@@ -6,6 +6,7 @@ use AnyEvent;
 use AnyEvent::Socket;
 use AnyEvent::Handle;
 use App::Queue::Queue;
+use App::Queue::MemoryQueue;
 
 with 'MooseX::Getopt';
 
@@ -19,9 +20,9 @@ has 'port' => (
 has 'queue' => (
     traits   => ['NoGetopt'],
     is       => 'ro',
-    isa      => 'App::Queue::Queue',
+    does     => 'App::Queue::Queue',
     required => 1,
-    default  => sub { App::Queue::Queue->new },
+    default  => sub { App::Queue::MemoryQueue->new },
 );
 
 has 'client_count' => (
