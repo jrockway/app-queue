@@ -74,6 +74,13 @@ sub _lreverse {
 sub take {
     my ($self, $cb) = @_;
 
+    # if other things are waiting for input, immediately delay this
+    # call
+    if (scalar @{$self->waiters}){
+        $self->add_waiter($cb);
+        return;
+    }
+
     my $msg = $self->_take1;
     $cb->($msg) if $cb && $msg;
     return $msg if $msg;
