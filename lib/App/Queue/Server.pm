@@ -45,9 +45,7 @@ sub cmd_take {
     my ($self, $h, $msg) = @_;
 
     if($msg->{block}){
-        warn 'blocking is ok';
         $self->queue->take( sub {
-                                warn 'finally got some data';
             my $data = shift;
             $h->push_write( json => { type => 'take', data => $data->data } );
         });
