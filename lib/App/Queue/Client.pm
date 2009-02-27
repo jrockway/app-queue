@@ -54,7 +54,7 @@ sub put {
 }
 
 sub take {
-    my ($self) = @_;
+    my ($self, $block_ok) = @_;
     my $fh = $self->connection;
 
     my $take = AnyEvent->condvar;
@@ -64,7 +64,7 @@ sub take {
         $take->send($data);
     });
 
-    $fh->push_write( json => { type => 'take' } );
+    $fh->push_write( json => { type => 'take', block => $block_ok ? 1 : 0 } );
 
     return $take;
 }

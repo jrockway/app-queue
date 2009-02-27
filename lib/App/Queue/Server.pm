@@ -43,12 +43,23 @@ sub cmd_put {
 
 sub cmd_take {
     my ($self, $h, $msg) = @_;
-    my $data = $self->queue->take;
-    if($data){
-        $h->push_write( json => { type => 'take', data => $data->data } );
+
+    if($msg->{block}){
+        warn 'blocking is ok';
+        $self->queue->take( sub {
+                                warn 'finally got some data';
+            my $data = shift;
+            $h->push_write( json => { type => 'take', data => $data->data } );
+        });
     }
     else {
-        $h->push_write( json => { type => 'take' } );
+        my $data = $self->queue->take;
+        if($data){
+            $h->push_write( json => { type => 'take', data => $data->data } );
+        }
+        else {
+            $h->push_write( json => { type => 'take' } );
+        }
     }
 }
 
