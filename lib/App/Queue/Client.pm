@@ -3,6 +3,9 @@ use Moose;
 use AnyEvent;
 use AnyEvent::Socket;
 use AnyEvent::Handle;
+use Math::Fibonacci qw(term);
+
+use namespace::clean -except => 'meta';
 
 with 'MooseX::Getopt';
 
@@ -67,6 +70,35 @@ sub take {
     $fh->push_write( json => { type => 'take' } );
 
     return $take;
+}
+
+# can wait "forever" for an object
+sub blocking_take {
+    my $self = shift;
+    my $interval = 0;
+    my $item = AnyEvent->condvar;
+    my $loop; $loop = sub {
+        my $got_item = $self->take;
+        $got_item->cb( sub {
+            my ($cv) = @_;
+            warn "GOT ITEM";
+            my $data = $cv->recv;
+            if($data){
+                $item->send($data);
+            }
+            else {
+                my $t;
+                $t = AnyEvent->timer( after => (term($interval)/10), cb => sub {
+                    $interval++;
+                    $loop->();
+                    undef $t;
+                });
+            }
+        });
+    };
+    $loop->();
+
+    return $item; # you have to ->recv on this
 }
 
 1;
